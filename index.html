@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>The HTML5 Herald</title>
+		<meta name="description" content="The HTML5 Herald">
+		<meta name="author" content="SitePoint">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/jquery.bracket.min.css" />
+		<script type="text/javascript" src="js/jquery.bracket.min.js"></script>
+		<!--[if lt IE 9]>
+			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<!--<script src="js/scripts.js"></script>-->
+		<script type="text/javascript">
+			function generateScheme(myData){
+				var saveData = {
+				      teams : [
+				        ["Team 1", "Team 2"],
+					 /* first matchup */
+				      /* second matchup */
+				      ],
+				      results : []
+				    }
+				
+				  /* Called whenever bracket is modified
+				   *
+				   * data:     changed bracket object in format given to init
+				   * userData: optional data given when bracket is created.
+				   */
+				  function saveFn(data, userData) {
+				    var json = jQuery.toJSON(data)
+				    $('#saveOutput').text('POST '+userData+' '+json)
+				    /* You probably want to do something like this
+				    jQuery.ajax("rest/"+userData, {contentType: 'application/json',
+				                                  dataType: 'json',
+				                                  type: 'post',
+				                                  data: json})
+				    */
+				  }
+				  
+				  var saveData1 = {
+					   teams : myData,
+				      results : []
+				  }
+				
+				  $(function() {
+				      var container = $('div#save .demo')
+				    	  container.bracket({
+				        init: saveData1,
+				        save: saveFn,
+				        userData: saveData1 })
+				
+				      /* You can also inquiry the current data */
+				      var data = container.bracket('data');
+					  console.log(jQuery.toJSON(data));
+				      $('#dataOutput').text(jQuery.toJSON(data))
+				    })
+			}
+		</script>
+		<div id="gen">Generate scheme</div>
+		<script>
+			$("#gen").click(function(){
+				var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "Marto", "Ico", "BaiHui"];
+				
+				//var ric = players.splice(0,1);
+				
+				function getRandomInt(min, max) {
+   				 return Math.floor(Math.random() * (max - min + 1)) + min;
+				}
+				
+				 function closest (num, arr) {
+              	  var curr = arr[0];
+               	 var diff = Math.abs (num - curr);
+              	  for (var val = 0; val < arr.length; val++) {
+                    var newdiff = Math.abs (num - arr[val]);
+                    if (newdiff < diff) {
+                        diff = newdiff;
+                        curr = arr[val];
+                    }
+                }
+                return curr;
+            }
+			
+			var array = [2, 4, 8, 16, 32, 64];
+            var s = players.length;
+            var contests = closest(s, array);
+			console.log(contests);
+			var myData = [];
+			for(var i = 0; i<contests;i++){
+				
+				var p1 = players.splice(getRandomInt(0,players.length-1), 1)[0];
+				var p2 = players.splice(getRandomInt(0,players.length-1), 1)[0];
+				if(!p1)
+					p1="Bot";
+				if(!p2)
+					p2="Bot";
+				myData.push([p1,p2]);
+				//console.log(p1 + ":" + p2);
+			}
+				console.log(myData);
+				generateScheme(myData);
+				
+				
+				
+			});
+		</script>
+		<div id="save">
+			<div class="demo"></div>
+		</div>
+		<!--<h4>Save output</h4>
+		<pre id="saveOutput">Try to first modify some scores or teams</pre>
+		<h4>Data inquired at startup</h4>
+		<pre id="dataOutput"></pre>-->
+	</body>
+
+</html>
