@@ -15,15 +15,8 @@
 	<body>
 		<!--<script src="js/scripts.js"></script>-->
 		<script type="text/javascript">
-			function generateScheme(myData){
-				var saveData = {
-				      teams : [
-				        ["Team 1", "Team 2"],
-					 /* first matchup */
-				      /* second matchup */
-				      ],
-				      results : []
-				    }
+			function generateScheme(myData, res){
+				
 				
 				  /* Called whenever bracket is modified
 				   *
@@ -31,7 +24,8 @@
 				   * userData: optional data given when bracket is created.
 				   */
 				  function saveFn(data, userData) {
-				    var json = jQuery.toJSON(data)
+				    var json = JSON.stringify(data);
+					console.log(json);
 				    $('#saveOutput').text('POST '+userData+' '+json)
 				    /* You probably want to do something like this
 				    jQuery.ajax("rest/"+userData, {contentType: 'application/json',
@@ -43,7 +37,7 @@
 				  
 				  var saveData1 = {
 					   teams : myData,
-				      results : []
+				      results : res
 				  }
 				
 				  $(function() {
@@ -55,15 +49,17 @@
 				
 				      /* You can also inquiry the current data */
 				      var data = container.bracket('data');
-					  console.log(jQuery.toJSON(data));
-				      $('#dataOutput').text(jQuery.toJSON(data))
+					  console.log(JSON.stringify(data));
+				      $('#dataOutput').text(JSON.stringify(data));
 				    })
+					
+					
 			}
 		</script>
 		<div id="gen">Generate scheme</div>
 		<script>
 			$("#gen").click(function(){
-				var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "Marto", "Ico", "BaiHui"];
+				var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "Marto", "Ico", "BaiHui", "Iaz"];
 				
 				//var ric = players.splice(0,1);
 				
@@ -89,23 +85,37 @@
             var contests = closest(s, array);
 			console.log(contests);
 			var myData = [];
+			var results = [];
 			for(var i = 0; i<contests;i++){
 				
 				var p1 = players.splice(getRandomInt(0,players.length-1), 1)[0];
 				var p2 = players.splice(getRandomInt(0,players.length-1), 1)[0];
-				if(!p1)
+				var r1;
+				var r2;
+				if(!p1){
 					p1="Bot";
-				if(!p2)
+					r1=0;
+				}
+				if(!p2){
 					p2="Bot";
+					r2=0;
+				}
+				if(!p1 && !p2){
+					r2=1;
+				}
 				myData.push([p1,p2]);
+				results.push([r1,r2]);
 				//console.log(p1 + ":" + p2);
 			}
 				console.log(myData);
-				generateScheme(myData);
+				generateScheme(myData, results);
+				
 				
 				
 				
 			});
+			
+			
 		</script>
 		<div id="save">
 			<div class="demo"></div>
