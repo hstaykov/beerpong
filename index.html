@@ -59,7 +59,7 @@
 		<div id="gen">Generate scheme</div>
 		<script>
 			$("#gen").click(function(){
-				var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "Marto", "Ico", "BaiHui", "Iaz"];
+				var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "asdasdasd", "Ico", "BaiHui", "Iaz"];
 				
 				//var ric = players.splice(0,1);
 				
@@ -74,7 +74,7 @@
                     var newdiff = Math.abs (num - arr[val]);
                     if (newdiff < diff) {
                         diff = newdiff;
-                        curr = arr[val];
+                        curr = arr[val+1];
                     }
                 }
                 return curr;
