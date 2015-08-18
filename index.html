@@ -13,117 +13,159 @@
 		<![endif]-->
 	</head>
 	<body>
+		<div id="gen">Generate scheme</div>
 		<!--<script src="js/scripts.js"></script>-->
 		<script type="text/javascript">
-			function generateScheme(myData, res){
-				
-				
-				  /* Called whenever bracket is modified
-				   *
-				   * data:     changed bracket object in format given to init
-				   * userData: optional data given when bracket is created.
-				   */
-				  function saveFn(data, userData) {
-				    var json = JSON.stringify(data);
-					console.log(json);
-				    $('#saveOutput').text('POST '+userData+' '+json)
-				    /* You probably want to do something like this
-				    jQuery.ajax("rest/"+userData, {contentType: 'application/json',
-				                                  dataType: 'json',
-				                                  type: 'post',
-				                                  data: json})
-				    */
-				  }
-				  
-				  var saveData1 = {
-					   teams : myData,
-				      results : res
-				  }
-				
-				  $(function() {
-				      var container = $('div#save .demo')
-				    	  container.bracket({
-				        init: saveData1,
-				        save: saveFn,
-				        userData: saveData1 })
-				
-				      /* You can also inquiry the current data */
-				      var data = container.bracket('data');
-					  console.log(JSON.stringify(data));
-				      $('#dataOutput').text(JSON.stringify(data));
-				    })
+			var globalData ={
+				players : [],
+				results : []
+			}
+				function generateScheme(obj){
 					
 					
-			}
-		</script>
-		<div id="gen">Generate scheme</div>
-		<script>
-			$("#gen").click(function(){
-				var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "asdasdasd", "Ico", "BaiHui", "Iaz"];
-				
-				//var ric = players.splice(0,1);
-				
-				function getRandomInt(min, max) {
-   				 return Math.floor(Math.random() * (max - min + 1)) + min;
+					  /* Called whenever bracket is modified
+					   *
+					   * data:     changed bracket object in format given to init
+					   * userData: optional data given when bracket is created.
+					   */
+					  function saveFn(data, userData) {
+						  
+					    var json = JSON.stringify(data);
+						console.log("----");
+						console.log(json);
+					    $('#saveOutput').text('POST '+userData+' '+json)
+					    /* You probably want to do something like this
+					    jQuery.ajax("rest/"+userData, {contentType: 'application/json',
+					                                  dataType: 'json',
+					                                  type: 'post',
+					                                  data: json})
+					    */
+						//$( ".editable:contains('Bot')").parent().remove();
+						$( ".increment").remove();
+						$( ".decrement").remove();
+					  }
+					  
+					  var saveData1 = {
+						   teams : obj.players,
+					      results : obj.results
+					  }
+					
+					  $(function() {
+					      var container = $('div#save .demo')
+					    	  container.bracket({
+					        init: saveData1,
+					        save: saveFn,
+					        userData: saveData1 })
+					
+					      /* You can also inquiry the current data */
+					      var data = container.bracket('data');
+						  console.log(JSON.stringify(data));
+					      $('#dataOutput').text(JSON.stringify(data));
+						  $( ".increment").remove();
+						$( ".decrement").remove();
+					    })	
 				}
-				
-				 function closest (num, arr) {
-              	  var curr = arr[0];
-               	 var diff = Math.abs (num - curr);
-              	  for (var val = 0; val < arr.length; val++) {
-                    var newdiff = Math.abs (num - arr[val]);
-                    if (newdiff < diff) {
-                        diff = newdiff;
-                        curr = arr[val+1];
-                    }
-                }
-                return curr;
-            }
 			
-			var array = [2, 4, 8, 16, 32, 64];
-            var s = players.length;
-            var contests = closest(s, array);
-			console.log(contests);
-			var myData = [];
-			var results = [];
-			for(var i = 0; i<contests;i++){
+				$("#gen").click(function(){
+					
+					var players = [];
+					$("input").each(function() {
+			            players.push($(this).val());
+						console.log($(this).val());
+			        });
+					
+					$(".input_fields_wrap").remove();
+					$("#gen").remove();
+					//var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "asdasdasd", "Ico", "BaiHui", "Iaz"];
+					
+					//var ric = players.splice(0,1);
+					
+					function getRandomInt(min, max) {
+	   				 return Math.floor(Math.random() * (max - min + 1)) + min;
+					}
+					
+					 function closest (num, arr) {
+	              	  var curr = arr[0];
+	               	 var diff = Math.abs (num - curr);
+	              	  for (var val = 0; val < arr.length; val++) {
+	                      if(num - arr[val] <= 0)
+	                          return arr[val];
+	                }
+	                return curr;
+	            }
 				
-				var p1 = players.splice(getRandomInt(0,players.length-1), 1)[0];
-				var p2 = players.splice(getRandomInt(0,players.length-1), 1)[0];
-				var r1;
-				var r2;
-				if(!p1){
-					p1="Bot";
-					r1=0;
+				var array = [2, 4, 8, 16, 32, 64];
+	            var s = players.length;
+	            var contests = closest(s, array);
+				console.log("People for scheme: " + contests);
+				console.log("current players: " + players.length);
+				
+				var myData = [];
+				var results = [];
+				for(var i = 0; i<contests/2;i++){
+					
+					var p1 = players.splice(getRandomInt(0,players.length-1), 1)[0];
+					var p2 = players.splice(getRandomInt(0,players.length-1), 1)[0];
+					var r1;
+					var r2;
+					if(!p1){
+						p1="служебно";
+						r1=0;
+					}
+					if(!p2){
+						p2="служебно";
+						if(r1==0)
+							r2=1;
+						else
+							r2=0;
+					}
+					
+					myData.push([p1,p2]);
+					results.push([r1,r2]);
+					globalData.players = myData;
+					globalData.results = results;
+					//console.log(p1 + ":" + p2);
 				}
-				if(!p2){
-					p2="Bot";
-					r2=0;
-				}
-				if(!p1 && !p2){
-					r2=1;
-				}
-				myData.push([p1,p2]);
-				results.push([r1,r2]);
-				//console.log(p1 + ":" + p2);
-			}
-				console.log(myData);
-				generateScheme(myData, results);
-				
-				
-				
-				
-			});
-			
-			
+			//		console.log(myData);
+					generateScheme(globalData);
+				});
 		</script>
 		<div id="save">
 			<div class="demo"></div>
+		</div>
+		<div class="input_fields_wrap">
+			<button class="add_field_button">Add More Fields</button>
+			<div>
+				<input type="text" name="mytext[]">
+			</div>
 		</div>
 		<!--<h4>Save output</h4>
 		<pre id="saveOutput">Try to first modify some scores or teams</pre>
 		<h4>Data inquired at startup</h4>
 		<pre id="dataOutput"></pre>-->
+		<script type="text/javascript">
+			$(document).ready(function() {
+			    var max_fields      = 10; //maximum input boxes allowed
+			    var wrapper         = $(".input_fields_wrap"); //Fields wrapper
+			    var add_button      = $(".add_field_button"); //Add button ID
+			    
+			    var x = 1; //initlal text box count
+			    $(add_button).click(function(e){ //on add input button click
+			        e.preventDefault();
+			        if(x < max_fields){ //max input box allowed
+			            x++; //text box increment
+			            $(wrapper).append('<div><input type="text" name="mytext[]"/><a href="#" class="remove_field">Remove</a></div>'); //add input box
+			        }
+			    });
+			    
+			    $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+			        e.preventDefault(); $(this).parent('div').remove(); x--;
+			    })
+			});
+			
+			
+		</script>
+		
 	</body>
 
 </html>
