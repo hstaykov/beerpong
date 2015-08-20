@@ -3,35 +3,43 @@ var globalData = {
     results: []
 }
 
+var dbUrl = "https://beerpongtourtest.firebaseio.com/";
+
+
+var currentGameId = guid();
+
+$('.gameId').html("Game id : " + currentGameId);
+
 function generateScheme(obj) {
+    var saveData1 = {
+        teams: obj.players,
+        results: obj.results
+    }
 
 
-    /* Called whenever bracket is modified
-     *
-     * data:     changed bracket object in format given to init
-     * userData: optional data given when bracket is created.
-     */
+    var url = dbUrl + "games/" + currentGameId + "/";
+    var firebaseRef = new Firebase(url);
+
+    var currentGameData = {
+        game: JSON.stringify(saveData1),
+        name: "Igra"
+    }
+
+    firebaseRef.set(currentGameData);
     function saveFn(data, userData) {
 
         var json = JSON.stringify(data);
         console.log("----");
         console.log(json);
-        $('#saveOutput').text('POST ' + userData + ' ' + json)
-        /* You probably want to do something like this
-        jQuery.ajax("rest/"+userData, {contentType: 'application/json',
-                                      dataType: 'json',
-                                      type: 'post',
-                                      data: json})
-        */
-        //$( ".editable:contains('Bot')").parent().remove();
+        var url = dbUrl + "games/" + currentGameId + "/game/";
+        var firebaseRef = new Firebase(url);
+        console.log(data);
+        firebaseRef.set(json);
         $(".increment").remove();
         $(".decrement").remove();
     }
 
-    var saveData1 = {
-        teams: obj.players,
-        results: obj.results
-    }
+
 
     $(function () {
         var container = $('div#save .demo')
@@ -47,6 +55,8 @@ function generateScheme(obj) {
         $('#dataOutput').text(JSON.stringify(data));
         $(".increment").remove();
         $(".decrement").remove();
+        $("#allGames").remove();
+        $("#gamesList").remove();
     })
 }
 
@@ -116,7 +126,7 @@ $("#gen").click(function () {
     generateScheme(globalData);
 });
 
-$("#another").click(function(){
+$("#another").click(function () {
     location.reload();
 });
 
@@ -143,33 +153,78 @@ $(document).ready(function () {
     })
 });
 
-var getCurrentTime = function(){
-	var currentDate = new Date();
-	var day = currentDate.getDate();
-	var month = currentDate.getMonth() + 1;
-	var year = currentDate.getFullYear();
+var getCurrentTime = function () {
+    var currentDate = new Date();
+    var day = currentDate.getDate();
+    var month = currentDate.getMonth() + 1;
+    var year = currentDate.getFullYear();
 
-	var currentTime = new Date();
-	var hours = currentTime.getHours();
-	var minutes = currentTime.getMinutes();
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
 
-	if (minutes < 10)
-    	minutes = "0" + minutes;
-	
-	return day + "/" + month + "/" + year + " " + hours + ":" + minutes;}
+    if (minutes < 10)
+        minutes = "0" + minutes;
+
+    return day + "/" + month + "/" + year + " " + hours + ":" + minutes;
+}
 
 
-var url = "https://beerpongtour.firebaseio.com/";
-	var firebaseRef = new Firebase(url);
-	var userIp;
-	 $(function() {
-      $.getJSON("https://api.ipify.org?format=jsonp&callback=?",
-      function(json) {
-          userIp = json.ip;
-   //    document.write("My public IP address is: ", json.ip);
-    firebaseRef.push(getCurrentTime() + " - " + userIp + " - " + navigator.userAgent) ;
-      }
-     );
-  });
+$(function () {
+    var url = dbUrl + "logins/";
+    var firebaseRef = new Firebase(url);
+    var userIp;
+    $.getJSON("https://api.ipify.org?format=jsonp&callback=?",
+        function (json) {
+            userIp = json.ip;
+            //    document.write("My public IP address is: ", json.ip);
+            firebaseRef.push(getCurrentTime() + " - " + userIp + " - " + navigator.userAgent);
+        }
+        );
+});
 
-   
+
+$("#allGames").click(showAllGames);
+function showAllGames(params) {
+    var url = dbUrl + "games/";
+    var firebaseRef = new Firebase(url);
+    firebaseRef.once('value', function (dataSnapshot) {
+        var ul = $("#gamesList");
+        for (var key in dataSnapshot.val()) {
+            var value = dataSnapshot.val()[key];
+            ul.append("<a  style='cursor: pointer' class='remove_field aGame' id='" + key + "'>" + key + "</a></br>")
+        }
+
+        $(".aGame").click(function () {
+            console.log("FLIC");
+            var id = $(this).attr('id');
+            var url = dbUrl + "games/" + id + "/game";
+            var firebaseRef = new Firebase(url);
+            firebaseRef.once('value', function (dataSnapshot) {
+
+                var game = dataSnapshot.val();
+                var init = JSON.parse(game);
+                $("#allASD").remove();
+                $('.gameId').html("Game id : " + id);
+                $("#allGames").remove();
+                var container = $('div#save .demo')
+                container.bracket({
+                    init: init
+                });
+
+            });
+        });
+    });
+}
+
+
+
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
