@@ -1,47 +1,56 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>Beerpong Tournament Schema</title>
-		<meta name="description" content="Beerpong Tournament Schema">
-		<meta name="author" content="SitePoint">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/jquery.bracket.min.css" />
-		<link rel="stylesheet" type="text/css" href="css/layout.css" />
-		<script type="text/javascript" src="js/jquery.bracket.min.js"></script>
-		<script src="https://cdn.firebase.com/v0/firebase.js"></script>
-		<!--[if lt IE 9]>
+
+<head>
+	<meta charset="utf-8">
+	<title>Beerpong Tournament Schema</title>
+	<meta name="description" content="Beerpong Tournament Schema">
+	<meta name="author" content="SitePoint">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/jquery.bracket.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/layout.css" />
+	<script type="text/javascript" src="js/jquery.bracket.min.js"></script>
+	<script src="https://cdn.firebase.com/v0/firebase.js"></script>
+	<!--[if lt IE 9]>
 			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-	</head>
-	<body>
-		<div class="center">
-			<h1>Beerpong Tournament Schema</h1>
-			<h4 class="gameId"></h4>
-			<p><div id="save">
-				<div class="demo"></div>
-			</div></p>
-			<div id="allASD">
-				<div class="input_fields_wrap">
-					<div>
-						<input type="text" name="mytext[]">
-						<a href="#" class="remove_field">Remove</a>
-					</div>
-				</div>
-				<button class="add_field_button minimal-indent">Add More Players</button>
-				<button id="gen" class="minimal-indent">Generate Schema</button>
-				<p id="playersCount">Current players: 1</p>
-				<p id="info">Click "de" for Dobule Elimination and "se" for Single</p>
-			</div>
-			<p>
-				<button id="another" class="minimal-indent">Another</button>
-			</p>
-			<p>
-				<button id="allGames" class="minimal-indent">Show all games</button>
-				<ul id="gamesList"></ul>
-			</p>
-			<script type="text/javascript" src="js/main.js"></script>
+</head>
+
+<body background="imgs/back.jpg">
+	<div class="center">
+		<h1>Beerpong Tournament Schema</h1>
+		<!--<h4 class="gameId"></h4>-->
+		<h4 class="gameName"></h4>
+		<div>
+			<input id="gameName" type="text" name="gameName" placeholder="Game name">
 		</div>
-	</body>
+		<hr>
+		<p>
+			<div id="save">
+				<div class="demo"></div>
+			</div>
+		</p>
+		<div id="allASD">
+			<div class="input_fields_wrap">
+				<div>
+					<input type="text" class="playerName" placeholder="Player/Team">
+					<a href="#" class="remove_field">Remove</a>
+				</div>
+			</div>
+			<button class="add_field_button minimal-indent">Add More Players</button>
+			<button id="gen" class="minimal-indent">Generate Schema</button>
+			<p id="playersCount">Current players: 1</p>
+			<p id="info" style="display: none">Click "de" for Dobule Elimination and "se" for Single</p>
+		</div>
+		<p>
+			<button id="another" class="minimal-indent">Another!!!</button>
+		</p>
+		<p>
+			<button id="allGames" class="minimal-indent">Show all games</button>
+			<ul id="gamesList"></ul>
+		</p>
+		<script type="text/javascript" src="js/main.js"></script>
+	</div>
+</body>
 
 </html>

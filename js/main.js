@@ -4,9 +4,12 @@ var globalData = {
 }
 
 var dbUrl = "https://beerpongtourtest.firebaseio.com/";
-
-
+var currentPlayersCount = 1;
+var currentGameName = "Niakakva igra";
 var currentGameId = guid();
+var max_fields = 32;
+
+
 
 $('.gameId').html("Game id : " + currentGameId);
 
@@ -22,7 +25,8 @@ function generateScheme(obj) {
 
     var currentGameData = {
         game: JSON.stringify(saveData1),
-        name: "Igra"
+        name: currentGameName,
+        time: new Date().getTime()
     }
 
     firebaseRef.set(currentGameData);
@@ -62,6 +66,15 @@ function generateScheme(obj) {
 
 $("#gen").click(function () {
 
+    if (!$("#gameName").val()) {
+        currentGameName = "Nova igra";
+    }
+    else {
+        currentGameName = $("#gameName").val();
+    }
+    $(".gameName").html("Game name: " + currentGameName);
+    $("#gameName").remove();
+
     var players = [];
     $("input").each(function () {
         players.push($(this).val());
@@ -71,11 +84,7 @@ $("#gen").click(function () {
     $(".input_fields_wrap").remove();
     $("#gen").remove();
     $(".add_field_button").remove();
-    $("#info").remove();
-    //var players = ["Riceto", "Pesho", "Gosho", "Totiu", "Ravda", "Rila", "Putinka", "Genata", "Gecata", "asdasdasd", "Ico", "BaiHui", "Iaz"];
-
-    //var ric = players.splice(0,1);
-
+    $("#info").show('slow');
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
@@ -130,38 +139,51 @@ $("#another").click(function () {
     location.reload();
 });
 
+var wrapper = $(".input_fields_wrap");
+function addNewField() {
+    if (currentPlayersCount < max_fields) { //max input box allowed
+        currentPlayersCount++; //text box increment
+
+        var $newFiled = $('<div style="display: none;"><input type="text"  id= "' + currentPlayersCount + '" class="playerName" placeholder="Player/Team" /><a href="#" class="remove_field">Remove</a></div>');
+        $(wrapper).append($newFiled);
+        $newFiled.show("fast"); //add input box
+        $(".playerName").keypress(function (e) {
+            if (e.which == 13 && $(this).val()) {
+                //addNewField(wrapper);
+            }
+        });
+
+        $("#playersCount").html("Current players: " + currentPlayersCount);
+    }
+}
+
 $(document).ready(function () {
-    var max_fields = 16; //maximum input boxes allowed
-    var wrapper = $(".input_fields_wrap"); //Fields wrapper
+
     var add_button = $(".add_field_button"); //Add button ID
     
-    var x = 1; //initlal text box count
-    $(add_button).click(function (e) { //on add input button click
+    (add_button).click(function (e) { //on add input button click
         e.preventDefault();
-        if (x < max_fields) { //max input box allowed
-            x++; //text box increment
-            $(wrapper).append('<div><input type="text" name="mytext[]"/><a href="#" class="remove_field">Remove</a></div>'); //add input box
-            $("#playersCount").html("Current players: " + x);
-        }
+        addNewField(wrapper);
+
     });
 
     $(wrapper).on("click", ".remove_field", function (e) { //user click on remove text
         e.preventDefault();
         $(this).parent('div').remove();
-        x--;
-        $("#playersCount").html("Current players: " + x);
+        currentPlayersCount--;
+        $("#playersCount").html("Current players: " + currentPlayersCount);
     })
 });
 
-var getCurrentTime = function () {
-    var currentDate = new Date();
+var convertTime = function (currentDate) {
+    //var currentDate = new Date();
     var day = currentDate.getDate();
     var month = currentDate.getMonth() + 1;
     var year = currentDate.getFullYear();
 
-    var currentTime = new Date();
-    var hours = currentTime.getHours();
-    var minutes = currentTime.getMinutes();
+    //var currentTime = new Date();
+    var hours = currentDate.getHours();
+    var minutes = currentDate.getMinutes();
 
     if (minutes < 10)
         minutes = "0" + minutes;
@@ -177,8 +199,8 @@ $(function () {
     $.getJSON("https://api.ipify.org?format=jsonp&callback=?",
         function (json) {
             userIp = json.ip;
-            //    document.write("My public IP address is: ", json.ip);
-            firebaseRef.push(getCurrentTime() + " - " + userIp + " - " + navigator.userAgent);
+            //    documentsdasdsa.write("My public IP address is: ", json.ip);
+            firebaseRef.push(convertTime(new Date()) + " - " + userIp + " - " + navigator.userAgent);
         }
         );
 });
@@ -190,13 +212,30 @@ function showAllGames(params) {
     var firebaseRef = new Firebase(url);
     firebaseRef.once('value', function (dataSnapshot) {
         var ul = $("#gamesList");
+        var sorted = [];
         for (var key in dataSnapshot.val()) {
             var value = dataSnapshot.val()[key];
-            ul.append("<a  style='cursor: pointer' class='remove_field aGame' id='" + key + "'>" + key + "</a></br>")
+            sorted.push({value:value, key:key});
         }
 
+        sorted.sort(function (a, b) {
+            return b.value.time - a.value.time;
+        });
+
+        //console.log(sorted);
+        for (var i = 0; i < sorted.length; i++) {
+            //console.log(sorted[i].value.time);
+            ul.append("<a  style='cursor: pointer' class='remove_field aGame' id='" + sorted[i].key + "'>" + sorted[i].value.name + " - " + convertTime(new Date(sorted[i].value.time)) + "</a></br>")
+        }
+
+        // for (var key in dataSnapshot.val()) {
+        //     var value = dataSnapshot.val()[key];
+        //     //   console.log(value.name + " - " + value.time);
+        //     ul.append("<a  style='cursor: pointer' class='remove_field aGame' id='" + key + "'>" + value.name + " - " + convertTime(new Date(value.time)) + "</a></br>")
+        // }
+
         $(".aGame").click(function () {
-            console.log("FLIC");
+
             var id = $(this).attr('id');
             var url = dbUrl + "games/" + id + "/game";
             var firebaseRef = new Firebase(url);
@@ -207,6 +246,7 @@ function showAllGames(params) {
                 $("#allASD").remove();
                 $('.gameId').html("Game id : " + id);
                 $("#allGames").remove();
+                $("#gameName").remove();
                 var container = $('div#save .demo')
                 container.bracket({
                     init: init
@@ -216,6 +256,7 @@ function showAllGames(params) {
         });
     });
 }
+
 
 
 
