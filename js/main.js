@@ -18,7 +18,7 @@ function generateScheme(obj) {
         teams: obj.players,
         results: obj.results
     }
-
+    console.log(saveData1);
 
     var url = dbUrl + "games/" + currentGameId + "/";
     var firebaseRef = new Firebase(url);
@@ -37,10 +37,11 @@ function generateScheme(obj) {
         console.log(json);
         var url = dbUrl + "games/" + currentGameId + "/game/";
         var firebaseRef = new Firebase(url);
-        console.log(data);
+        //      console.log(data);
         firebaseRef.set(json);
         $(".increment").remove();
         $(".decrement").remove();
+        generateScore(data);
     }
 
 
@@ -102,8 +103,8 @@ $("#gen").click(function () {
     var array = [2, 4, 8, 16, 32, 64];
     var s = players.length;
     var contests = closest(s, array);
-    console.log("People for scheme: " + contests);
-    console.log("current players: " + players.length);
+    // console.log("People for scheme: " + contests);
+    // console.log("current players: " + players.length);
 
     var myData = [];
     var results = [];
@@ -215,7 +216,7 @@ function showAllGames(params) {
         var sorted = [];
         for (var key in dataSnapshot.val()) {
             var value = dataSnapshot.val()[key];
-            sorted.push({value:value, key:key});
+            sorted.push({ value: value, key: key });
         }
 
         sorted.sort(function (a, b) {
@@ -268,4 +269,136 @@ function guid() {
     }
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
         s4() + '-' + s4() + s4() + s4();
+}
+
+
+
+function generateScore(json) {
+
+
+    var res = [];
+    var secondTeam = [];
+    var firstTeam = [];
+    var d = new Array();
+    for (var i = 0; i < json.results[0].length; i++) {
+        if (i == 0) {
+            res.push([]);
+            var team = [];
+            for (j = 0; j < json.results[0][i].length; j++) {
+                //	console.log(json.results[0][i][j]);
+                res[0].push([json.results[0][i][j],
+                    [json.teams[j][0], json.teams[j][1]]
+                ]);
+
+                if (res.length == 1) {
+                    res.push([]);
+                }
+                d[json.teams[j][0]] = json.results[0][i][j][0];
+                d[json.teams[j][1]] = json.results[0][i][j][1];
+                if (json.results[0][i][j][0] > json.results[0][i][j][1]) {
+                    if (team.length == 0)
+                        team.push(json.teams[j][0]);
+                    else {
+                        team.push(json.teams[j][0]);
+                        res[1].push([team]);
+                        team = [];
+                    }
+
+                } else {
+                    if (team.length == 0)
+                        team.push(json.teams[j][1]);
+                    else {
+                        team.push(json.teams[j][1]);
+                        res[1].push([team]);
+                        team = [];
+                    }
+                }
+
+            }
+
+            //   console.log(JSON.stringify(res));
+        } else {
+            res.push([]);
+
+            for (j = 0; j < json.results[0][i].length; j++) {
+                console.log(i);
+                console.log(JSON.stringify(res[i][j]));
+
+
+
+                if (res[i][j]) {
+                    res[i][j].push(json.results[0][i][j]);
+               
+                    //  console.log(JSON.stringify(res[i][j]));
+                    if (res[i][j][1][0] > res[i][j][1][1]) {
+                        if (team.length == 0)
+                            team.push(res[i][j][0][0]);
+                        else {
+                            team.push(res[i][j][0][0]);
+                            res[i + 1].push([team]);
+                            team = [];
+                        }
+                        if (i == json.results[0].length - 2) {
+                            firstTeam.push(res[i][j][0][0]);
+                            secondTeam.push(res[i][j][0][1]);
+                        }
+
+                    } else {
+                        if (team.length == 0)
+                            team.push(res[i][j][0][1]);
+                        else {
+                            team.push(res[i][j][0][1]);
+                            res[i + 1].push([team]);
+                            team = [];
+                        }
+                        if (i == json.results[0].length - 2) {
+                            firstTeam.push(res[i][j][0][1]);
+                            secondTeam.push(res[i][j][0][0]);
+                        }
+                    }
+
+                    d[res[i][j][0][1]] = d[res[i][j][0][1]] + res[i][j][1][1];
+                    d[res[i][j][0][0]] = d[res[i][j][0][0]] + res[i][j][1][0];
+
+                    if (i == json.results[0].length - 1) {
+
+                        res[i + 1].push(json.results[0][i][j + 1]);
+                        d[secondTeam[0]] = d[secondTeam[0]] + json.results[0][i][j + 1][0];
+                        d[secondTeam[1]] = d[secondTeam[1]] + json.results[0][i][j + 1][1];
+
+                        res[i + 1].push(secondTeam);
+                    }
+                }
+            }
+        }
+    }
+
+    // console.log(d);
+    savePlayers(d);
+}
+
+function savePlayers(playersMap) {
+
+    for (var key in playersMap) {
+        if (playersMap.hasOwnProperty(key)) {
+            var player = {
+                name: key,
+                score: playersMap[key]
+            };
+            var url = dbUrl + "players/" + key + "/";
+            var firebaseRef = new Firebase(url);
+            if (playersMap[key]) {
+                var firebaseRef2 = new Firebase(url + "score");
+                firebaseRef2.once('value', function (dataSnapshot) {
+                  //  alert(JSON.parse(dataSnapshot.val()));
+                    player.score = JSON.parse(dataSnapshot.val()) + playersMap[key];
+                });
+                firebaseRef.set(player);
+            }
+         
+            //   console.log(key + " -> " + playersMap[key]);
+        }
+    }
+    
+    // firebaseRef.push();
 }
